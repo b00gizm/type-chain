@@ -1,0 +1,25 @@
+root = true
+
+[*.{js,ts,jsx,tsx}]
+end_of_line = lf
+insert_final_newline = true
+indent_style = space
+indent_size = 2
+
+[*.json]
+end_of_line = lf
+insert_final_newline = true
+indent_style = space
+indent_size = 2
+
+[Dockerfile]
+end_of_line = lf
+insert_final_newline = true
+indent_style = space
+indent_size = 4
+
+[DOCKER_REPOSITORY]
+insert_final_newline = false
+
+[DOCKER_TAG_LATEST]
+insert_final_newline = false
