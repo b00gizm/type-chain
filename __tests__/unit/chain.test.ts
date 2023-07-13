@@ -1,5 +1,5 @@
 import { expectTypeOf } from "expect-type"
-import chain from "@/index"
+import chain from "../../index"
 
 describe("chain", () => {
   it("should be defined", () => {
