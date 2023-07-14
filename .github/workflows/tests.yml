@@ -1,0 +1,27 @@
+name: Tests and coverage
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: true
+      matrix:
+        node-versions: [16.x, 18.x]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-versions }}
+
+    - name: Install dependencies
+      run: yarn install --frozen-lockfile
+
+    - name: Run tests
+      run: yarn test
