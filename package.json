@@ -5,6 +5,13 @@
   "main": "index.js",
   "license": "MIT",
   "author": "Pascal Cremer",
+  "keywords": [
+    "typescript",
+    "type-safe",
+    "utils",
+    "functional",
+    "fp"
+  ],
   "dependencies": {},
   "devDependencies": {
     "@tsconfig/recommended": "^1.0.2",

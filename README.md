@@ -1,5 +1,7 @@
 # typed-chain
 
+[![npm version](https://badge.fury.io/js/@b00gizm%2Ftyped-chain.svg)](https://badge.fury.io/js/@b00gizm%2Ftyped-chain)
+
 A type-safe way to combine interdependent functions into a callable chain.
 
 ```typescript
