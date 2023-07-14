@@ -35,8 +35,9 @@ type Chain<
  * If there are more than one argument in the first function, the the second to
  * last arguments will be passed to the second function, and so on.
  *
- * @param {...functions} funcs - The functions to chain together
- * @returns {function} A function that will execute the chain of functions
+ * @typedef {function(any): any} AnyFunc - Any function
+ * @param {...AnyFunc} funcs - The functions to chain together
+ * @returns {AnyFunc} A function that will execute the chain of functions
  */
 export function chain<LType extends [AnyFunc, ...AnyFunc[]]>(
   ...funcs: LType & Chain<AnyFunc, LType>
@@ -52,6 +53,13 @@ export function chain<LType extends [AnyFunc, ...AnyFunc[]]>(
   }
 }
 
+/**
+ * Asynchronous variant of {@link chain}.
+ *
+ * @typedef {function(...any): Promise<any>} AnyAsyncFunc - Any async function
+ * @param {...AnyAsyncFunc} funcs - The async functions to chain together
+ * @returns {AnyAsyncFunc} A function that will execute the chain of async functions
+ */
 export function asyncChain<LType extends [AnyAsyncFunc, ...AnyAsyncFunc[]]>(
   ...funcs: LType & Chain<AnyAsyncFunc, LType>
 ): (
