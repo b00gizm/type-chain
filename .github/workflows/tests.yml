@@ -9,7 +9,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        node-versions: [16.x, 18.x]
+        node-versions: [16.x, 18.x, 20.x]
 
     steps:
     - name: Checkout repository
