@@ -1,19 +1,31 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-type First<T extends any[]> = T extends [infer F, ...any] ? F : never
-type Last<T extends unknown[]> = T extends [...any, infer L] ? L : never
-type Tail<T extends unknown[]> = T extends [any, ...infer R] ? R : never
-type ArgTypes<F> = F extends (...args: infer A) => any ? A : never
-type FirstArgType<F> = F extends (arg: infer A, ...rest: any) => any ? A : never
+type First<T extends unknown[]> = T extends [infer F, ...unknown[]] ? F : never
+type Last<T extends unknown[]> = T extends [...unknown[], infer L] ? L : never
+type Tail<T extends unknown[]> = T extends [unknown, ...infer R] ? R : never
+type ArgTypes<F> = F extends (...args: infer A) => unknown ? A : never
+type FirstArgType<F> = F extends (arg: infer A, ...rest: any) => unknown
+  ? A
+  : never
 type LookUp<T, K extends keyof any, Default = never> = K extends keyof T
   ? T[K]
   : Default
 type LaxReturnType<F> = F extends (...args: any) => infer R ? R : never
 
 type AnyFunc = (...arg: any) => any
+type AnyAsyncFunc = (...arg: any) => Promise<any>
+type IsAsyncFunc<F> = F extends (...args: any) => Promise<any> ? true : false
 
-type Chain<A extends [AnyFunc, ...AnyFunc[]], B extends AnyFunc[] = Tail<A>> = {
-  [K in keyof A]: (...args: ArgTypes<A[K]>) => FirstArgType<LookUp<B, K, any>>
+type Chain<
+  FType extends AnyFunc | AnyAsyncFunc,
+  Left extends [FType, ...FType[]],
+  Right extends FType[] = Tail<Left>,
+> = {
+  [LKey in keyof Left]: (
+    ...args: ArgTypes<Left[LKey]>
+  ) => IsAsyncFunc<Left[LKey]> extends true
+    ? Promise<FirstArgType<LookUp<Right, LKey, any>>>
+    : FirstArgType<LookUp<Right, LKey, any>>
 }
 
 /**
@@ -26,8 +38,8 @@ type Chain<A extends [AnyFunc, ...AnyFunc[]], B extends AnyFunc[] = Tail<A>> = {
  * @param {...functions} funcs - The functions to chain together
  * @returns {function} A function that will execute the chain of functions
  */
-export default function <LType extends [AnyFunc, ...AnyFunc[]]>(
-  ...funcs: LType & Chain<LType>
+export function chain<LType extends [AnyFunc, ...AnyFunc[]]>(
+  ...funcs: LType & Chain<AnyFunc, LType>
 ): (...args: ArgTypes<First<LType>>) => LaxReturnType<Last<LType>> {
   return (...args: ArgTypes<First<LType>>): LaxReturnType<Last<LType>> => {
     const [first] = funcs.reduce((accumulator, nextFunc) => {
@@ -37,5 +49,23 @@ export default function <LType extends [AnyFunc, ...AnyFunc[]]>(
     }, args as any)
 
     return first as LaxReturnType<Last<LType>>
+  }
+}
+
+export function asyncChain<LType extends [AnyAsyncFunc, ...AnyAsyncFunc[]]>(
+  ...funcs: LType & Chain<AnyAsyncFunc, LType>
+): (
+  ...args: ArgTypes<First<LType>>
+) => Promise<Awaited<LaxReturnType<Last<LType>>>> {
+  return async (
+    ...args: ArgTypes<First<LType>>
+  ): Promise<Awaited<LaxReturnType<Last<LType>>>> => {
+    const [first] = await funcs.reduce(async (accumulator, nextFunc) => {
+      const [first, ...rest] = await accumulator
+      const result = await nextFunc(first, ...rest)
+      return [result, ...rest]
+    }, args as any)
+
+    return first as Awaited<LaxReturnType<Last<LType>>>
   }
 }
